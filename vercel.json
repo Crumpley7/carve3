@@ -1,0 +1,4 @@
+{
+    "builds": [{ "src": "carving_algorithm4.py", "use": "@vercel/python" }],
+    "routes": [{ "src": "/(.*)", "dest": "carving_algorithm4.py"}]
+}
