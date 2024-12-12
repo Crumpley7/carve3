@@ -7,31 +7,31 @@ from scipy.ndimage.filters import convolve
 app = Flask(__name__)
 
 def calc_energy(img):
-    filter_du = np.array([
+    du_filter = np.array([
         [1.0, 2.0, 1.0],
         [0.0, 0.0, 0.0],
         [-1.0, -2.0, -1.0],
     ])
-    filter_du = np.stack([filter_du] * 3, axis=2)
+    du_filter = np.stack([du_filter] * 3, axis=2)
 
-    filter_dv = np.array([
+    dv_filter = np.array([
         [1.0, 0.0, -1.0],
         [2.0, 0.0, -2.0],
         [1.0, 0.0, -1.0],
     ])
-    filter_dv = np.stack([filter_dv] * 3, axis=2)
+    dv_filter = np.stack([dv_filter] * 3, axis=2)
 
     img = img.astype('float32')
 
-    convolved = np.absolute(convolve(img, filter_du)) + np.absolute(convolve(img, filter_dv))
+    convolved = np.absolute(convolve(img, du_filter)) + np.absolute(convolve(img, dv_filter))
 
-    energy_map = convolved.sum(axis=2)
+    mapForEnergy = convolved.sum(axis=2)
 
-    return energy_map
+    return mapForEnergy
 
-def crop_c(img, scale_c):
+def crop_c(img, c_scale):
     r, c, _ = img.shape
-    new_c = int(scale_c * c)
+    new_c = int(c_scale * c)
 
     for i in range(c - new_c):
         img = carve_column(img)
@@ -61,8 +61,8 @@ def carve_column(img):
 
 def minimum_seam(img):
     r, c, _ = img.shape
-    energy_map = calc_energy(img)
-    M = energy_map.copy()
+    mapForEnergy = calc_energy(img)
+    M = mapForEnergy.copy()
     backtrack = np.zeros_like(M, dtype=int)
 
     for i in range(1, r):
